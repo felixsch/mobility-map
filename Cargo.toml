@@ -1,0 +1,15 @@
+[workspace]
+members = [
+    "applications/run-migrations", 
+    "applications/frontend-worker",
+
+    "components/database_connection",
+]
+
+resolver="2"
+
+[profile.dev]
+opt-level = 0
+
+[profile.release]
+opt-level = 3

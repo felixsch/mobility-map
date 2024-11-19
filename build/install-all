@@ -1,0 +1,8 @@
+#!/bin/bash
+
+packages=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[].manifest_path')
+
+for package in $packages; do
+  path=$(dirname $package)
+  cargo install --path $path
+done
