@@ -1,2 +1,5 @@
 [tools]
 rust = "latest"
+
+[env]
+_.file = '.env'

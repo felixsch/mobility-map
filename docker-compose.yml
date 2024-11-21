@@ -20,9 +20,35 @@ services:
       dockerfile: Dockerfile
     env_file: ".env"
 
+  x-one-shot: &one-shot
+    restart: no
+    labels:
+      - "com.docker.compose.container-number=0"
+      - "com.docker.compose.oneoff=True"
+    profiles:
+      - one-shot
+
   migration:
     <<: *mobility-map
-    command: run-migrations
+    container_name: migration
+    depends_on:
+      postgis:
+        condition: service_healthy
+
+  gtfs-import:
+    <<: [*mobility-map, *one-shot]
+    command: run-gtfs-import
+    depends_on:
+      postgis:
+        condition: service_healthy
+
+  osm-import:
+    <<: *one-shot
+    image: iboates/osm2pgsql:latest
+    env_file: ".env"
+    volumes:
+      - ./data:/data
+      - ./scripts/mobility-flex.lua:/config/mobility-flex.lua
     depends_on:
       postgis:
         condition: service_healthy

@@ -7,4 +7,4 @@ RUN apt-get update && \
 WORKDIR /usr/src/mobility-map
 COPY . .
 
-RUN ./build/install-all
+RUN ./scripts/install-all-packages

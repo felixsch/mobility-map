@@ -4,5 +4,6 @@ version = "0.0.1"
 edition = "2021"
 
 [dependencies]
-database-connection = { path = "../../components/database_connection" }
+common = { path = "../../components/common" }
 tokio = { version = "1", features = ["full"] }
+log = "0.4.22"

@@ -1,14 +1,25 @@
-use database_connection;
-use database_connection::sqlx;
+use common::database;
+use common::database::sqlx;
+use common::logging;
 
-use tokio::time::{sleep, Duration};
+use log::{error, info};
 
 #[tokio::main]
 async fn main() {
-    let connection = database_connection::connect().await.unwrap();
+    logging::init();
 
-    let _ = sqlx::query("SELECT 1").fetch_one(&connection).await;
+    let result: Result<(), sqlx::Error> = async {
+        let pool = database::connect().await?;
 
-    sleep(Duration::from_millis(1000)).await;
-    println!("I'm done now");
+        database::migrate_job_queue(&pool).await?;
+        database::migrate_tables(&pool).await?;
+
+        Ok(())
+    }
+    .await;
+
+    match result {
+        Ok(_) => info!("migration complete"),
+        Err(err) => error!("migration failed: {}", err),
+    }
 }
