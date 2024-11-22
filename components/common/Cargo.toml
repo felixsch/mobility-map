@@ -8,3 +8,4 @@ sqlx = { version = "0.8", features = [ "runtime-tokio", "postgres" ] }
 env_logger = "0.11.5"
 log = "0.4.22"
 apalis = { version = "0.5.5", features = ["postgres"] }
+anyhow = { version = "1.0.93", features = ["std", "backtrace"] }

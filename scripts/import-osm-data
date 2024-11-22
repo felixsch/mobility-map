@@ -2,25 +2,11 @@
 
 source .env || echo "Could not load .env file. Maybe missing?"
 
-ACTION="$1"
-shift
-
-# Allow updating the OSM database without reimporting
-# the whole dataset
-MODE="--create"
-if [ $ACTION == "update" ]; then
-  MODE="--append"
-  echo "Updating OSM data..."
-else
-  echo "Init OSM data..."
-fi
-
-
-docker-compose run --rm osm-import  \
-  --database=${DATABASE_URL}        \
-  $MODE                             \
-  --slim                            \
-  --prefix osm                      \
-  --output=flex                     \
-  --style=/config/mobility-flex.lua \
-  /data/${EXTRACT_FILE}
+docker-compose run --rm osm-importer \
+  --database=${DATABASE_URL}         \
+  --create                           \
+  -v                                 \
+  --prefix osm                       \
+  --output=flex                      \
+  --style=/config/mobility-flex.lua  \
+  ${EXTRACT_FILE}

@@ -1,8 +1,10 @@
-use env_logger::Builder;
+use env_logger::{Builder, Env};
 use std::io::Write;
 
 pub fn init() -> () {
-    Builder::from_default_env()
+    let env = Env::default().filter_or("LOG_LEVEL", "info");
+
+    Builder::from_env(env)
         .format(|buf, record| writeln!(buf, "{}: {}", record.level(), record.args()))
         .init()
 }

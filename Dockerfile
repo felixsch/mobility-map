@@ -5,6 +5,10 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /usr/src/mobility-map
+
 COPY . .
+
+RUN cargo fetch
+RUN cargo build --release
 
 RUN ./scripts/install-all-packages

@@ -4,11 +4,13 @@ ifneq (,$(wildcard ./.env))
     export
 endif
 
-.PHONY: psql clean confirm_clean import-osm
+.PHONY: build psql clean confirm_clean import-osm-data import-gtfs-data migrate-db
+
+build:
+	docker-compose build x-mobility-map
 
 psql:
 	@echo "Connecting to postgis database..."
-	docker-compose up -d
 	docker-compose exec -ti postgis psql -U ${POSTGRES_USER}
 
 confirm_clean:
@@ -18,18 +20,15 @@ clean: confirm_clean
 	@echo "Removing all data.."
 	docker-compose down -v --remove-orphans
 
-import-osm-data:
+migrate-db:
+	@echo "Migrating database.."
+	docker-compose up -d migration postgis
+
+import-osm-data: migrate-db
 	@echo "Importing osm data.. This takes a while!"
-	docker-compose up -d migration postgis
-	./scripts/import-osm-data init
+	./scripts/import-osm-data
 
-update-osm-data:
-	@echo "Update osm data.. This takes a while!"
-	docker-compose up -d migration postgis
-	./scripts/import-osm-data update
-
-import-gtfs:
+import-gtfsdata: migrate-db
 	@echo "Importing gtfs data.. This takes a while!"
-	docker-compose up -d migration postgis
-	docker-compose run --rm gtfs-import
+	docker-compose run --rm gtfs-importer run
 	
