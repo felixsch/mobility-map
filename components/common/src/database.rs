@@ -1,11 +1,12 @@
 use crate::Result;
 use apalis::postgres::PostgresStorage;
-use sqlx::postgres::{PgPool, PgPoolOptions};
+use sqlx::postgres::PgPoolOptions;
 use std::env;
 
 pub use sqlx;
+pub type Pool = sqlx::PgPool;
 
-pub async fn connect() -> Result<PgPool> {
+pub async fn connect() -> Result<Pool> {
     let url = env::var("DATABASE_URL").expect("no database connection URL specified");
 
     let pool = PgPoolOptions::new()
@@ -15,7 +16,7 @@ pub async fn connect() -> Result<PgPool> {
     Ok(pool)
 }
 
-pub async fn migrate_job_queue(conn: &PgPool) -> Result<()> {
+pub async fn migrate_job_queue(conn: &Pool) -> Result<()> {
     let mut migrator = PostgresStorage::migrations();
 
     // Currently sqlx lacks support for multiple migrations
@@ -27,7 +28,7 @@ pub async fn migrate_job_queue(conn: &PgPool) -> Result<()> {
     Ok(())
 }
 
-pub async fn migrate_tables(conn: &PgPool) -> Result<()> {
+pub async fn migrate_tables(conn: &Pool) -> Result<()> {
     // Same as above. There should be an table name option and
     // not have it hardcoded
     // See: https://github.com/launchbadge/sqlx/issues/1698

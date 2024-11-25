@@ -3,7 +3,7 @@ members = [
     "applications/run-migrations", 
     "applications/frontend-worker",
 
-    "components/common",
+    "components/common", "applications/gtfs-importer", "components/gtfs",
 ]
 
 resolver="2"
