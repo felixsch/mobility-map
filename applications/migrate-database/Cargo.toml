@@ -1,10 +1,9 @@
 [package]
-name = "gtfs-importer"
-version = "0.1.0"
+name = "migrate-database"
+version = "0.0.1"
 edition = "2021"
 
 [dependencies]
 common = { path = "../../components/common" }
-gtfs = { path = "../../components/gtfs" }
 tokio = { version = "1", features = ["full"] }
 log = "0.4.22"

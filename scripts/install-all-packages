@@ -1,7 +1,0 @@
-#!/bin/bash
-
-set -e
-
-for app in applications/*; do
-  cargo install --path $app
-done

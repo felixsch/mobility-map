@@ -1,0 +1,11 @@
+#!/bin/bash
+
+set -e
+
+TARGET="target/release"
+
+for APP_PATH in applications/*; do
+  APP_NAME=$(basename "${APP_PATH}")
+
+  cp "${TARGET}/${APP_NAME}" /usr/local/bin
+done

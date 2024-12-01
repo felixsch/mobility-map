@@ -1,7 +1,0 @@
-[package]
-name = "frontend-worker"
-version = "0.1.0"
-edition = "2021"
-
-[dependencies]
-common = { path = "../../components/common" }

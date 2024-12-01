@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}mobility-map{% endblock %}</title>
+    <link href="/assets/css/style.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css" />
+    <style>
+        #map { height: 400px; }
+    </style>
+</head>
+<body>
+    <header class="bg-primary text-white p-3">
+        <h1 class="container">header</h1>
+    </header>
+    <div class="container mt-4">
+        {% block content %}{% endblock %}
+    </div>
+
+    <footer class="bg-secondary text-white p-3 mt-4">
+        {% block content %}
+          <p class="container">footer</p>
+        {% endblock %}
+    </footer>
+
+    <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"></script>
+    <script src="/assets/js/map.js"></script>
+</body>
+</html>

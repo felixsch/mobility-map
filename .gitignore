@@ -7,5 +7,7 @@
 **/*.swp
 **/*.swo
 .DS_Store
+.yarn/*
+.pnp.*
 
 data/**

@@ -1,5 +1,6 @@
 [tools]
-rust = "latest"
+rust = "1.82"
+yarn = "4.5.3"
 
 [env]
 _.file = '.env'

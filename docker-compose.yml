@@ -9,7 +9,7 @@ services:
     environment:
       PGUSER: "${POSTGRES_USER}"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -30,16 +30,16 @@ services:
     profiles:
       - one-shot
 
-  migration:
-    <<: *mobility-map
-    command: run-migrations
+  db-migrator:
+    <<: [*mobility-map, *one-shot]
     depends_on:
       postgis:
         condition: service_healthy
 
   gtfs-importer:
     <<: [*mobility-map, *one-shot]
-    command: run-gtfs-import
+    volumes:
+      - ./data:/usr/src/mobility-map/data
     depends_on:
       postgis:
         condition: service_healthy
@@ -55,13 +55,14 @@ services:
       postgis:
         condition: service_healthy
 
-
   frontend:
     <<: *mobility-map
-    command: sleep infinity
+    command: frontend-worker
+    ports:
+      - "3000:3000"
     depends_on:
-      migration:
-        condition: service_completed_successfully
+      postgis:
+        condition: service_healthy
 
 volumes:
   database:

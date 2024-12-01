@@ -21,7 +21,23 @@ pub struct Stop {
 }
 
 impl Importable for Stop {
-    async fn create_or_update(self, _conn: &Pool) -> Result<Self> {
+    async fn create_or_update(self, conn: &Pool) -> Result<Self> {
+        use sqlx;
+
+        {
+            sqlx::query(
+                "INSERT INTO stops (id, name, location)
+                        VALUES ($1, $2, ST_SetSRID(ST_MakePoint($3, $4), 4326))
+                     ON CONFLICT (id) DO UPDATE SET name = excluded.name,
+                                                    location = excluded.location",
+            )
+            .bind(&self.id)
+            .bind(&self.name)
+            .bind(&self.lat)
+            .bind(&self.lon)
+            .execute(conn)
+            .await?;
+        }
         Ok(self)
     }
 }

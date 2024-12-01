@@ -1,9 +1,10 @@
 [package]
-name = "run-migrations"
-version = "0.0.1"
+name = "import-gtfs-data"
+version = "0.1.0"
 edition = "2021"
 
 [dependencies]
 common = { path = "../../components/common" }
+gtfs = { path = "../../components/gtfs" }
 tokio = { version = "1", features = ["full"] }
 log = "0.4.22"

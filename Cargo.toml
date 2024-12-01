@@ -1,9 +1,11 @@
 [workspace]
 members = [
-    "applications/run-migrations", 
-    "applications/frontend-worker",
+    "applications/migrate-database",
+    "applications/import-gtfs-data",
+    "applications/run-frontend",
 
-    "components/common", "applications/gtfs-importer", "components/gtfs",
+    "components/common",
+    "components/gtfs",
 ]
 
 resolver="2"

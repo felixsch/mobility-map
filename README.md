@@ -57,27 +57,33 @@ flowchart
 
 ## How to run locally
 
+First make sure you have the following host dependencies installed on you system:
 
+  * `docker-compose` - A running docker-compsoe version
+  * `make` - To run abitrary scriptlets to aid development process
 
+```
 
+# setup environment and edit as needed
+cp .env.example .env
 
+# build the application
+make build
 
+# migrate the new created database
+make migrate-db
 
----
+# run OSM import
+# NOTE: make sure you have downloaded required osm data and gtfs available in the /data directory.
+#       See the .env file for information where to obtain the initial data
+make import-osm-data
 
----
+# run GTFS import
+make import-gtfs-data
 
+# analyze data (optional: this is required if you want to see overall statistics. plain frontend view works without it)
+make analyze-state-data
 
-
-
-
-
-
-There are multiple interesting questions surrounding German public transport network which are hard to answer and scientific studies are scarce. Therefore this experiment in form of a software engineering project aims to give initial data to 
-
-
-
-The question: **How much of the total population has access to public transport** is what drives this project.
-
-The idea is to 
-
+# run frontend
+make frontend
+```
