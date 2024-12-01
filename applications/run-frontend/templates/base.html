@@ -1,30 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}mobility-map{% endblock %}</title>
     <link href="/assets/css/style.css" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css" />
     <style>
-        #map { height: 400px; }
+#map { height: 400px; }
     </style>
-</head>
-<body>
-    <header class="bg-primary text-white p-3">
-        <h1 class="container">header</h1>
-    </header>
-    <div class="container mt-4">
+  </head>
+  <body>
+    <div class="container">
+      <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
+        <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
+          <svg class="bi me-2" width="40" height="32"><use xlink:href="#bootstrap"></use></svg>
+          <span class="fs-4">Simple header</span>
+        </a>
+
+        <ul class="nav nav-pills">
+          <li class="nav-item"><a href="#" class="nav-link active" aria-current="page">Home</a></li>
+          <li class="nav-item"><a href="#" class="nav-link">Features</a></li>
+          <li class="nav-item"><a href="#" class="nav-link">Pricing</a></li>
+          <li class="nav-item"><a href="#" class="nav-link">FAQs</a></li>
+          <li class="nav-item"><a href="#" class="nav-link">About</a></li>
+        </ul>
+      </header>
+      <div class="container mt-4">
+        <button type="button" class="btn btn-primary">Primary</button>
         {% block content %}{% endblock %}
-    </div>
+      </div>
 
-    <footer class="bg-secondary text-white p-3 mt-4">
+      <footer class="bg-secondary text-white p-3 mt-4">
         {% block content %}
-          <p class="container">footer</p>
+        <p class="container">footer</p>
         {% endblock %}
-    </footer>
+      </footer>
 
-    <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"></script>
-    <script src="/assets/js/map.js"></script>
-</body>
+      <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"></script>
+      <script src="/assets/js/mobility-map.js"></script>
+  </body>
 </html>

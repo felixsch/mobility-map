@@ -1,0 +1,17 @@
+{
+  "name": "run-frontend",
+  "packageManager": "yarn@4.5.3",
+  "dependencies": {
+    "bootstrap": "^5.3.3",
+    "sass": "^1.81.0",
+    "typescript": "^5.7.2"
+  },
+  "scripts": {
+    "build:scss": "sass --quiet -I $(pwd)/node_modules -I $(pwd)/src/scss src/scss/style.scss static/css/style.css",
+    "build:ts": "tsc",
+    "build": "yarn build:scss && yarn build:ts",
+    "watch:scss": "sass --watch src/scss/style.scss:static/css/style.css",
+    "watch:ts": "tsc --watch",
+    "watch": "yarn watch:scss & yarn watch:ts"
+  }
+}

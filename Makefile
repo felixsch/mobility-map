@@ -10,7 +10,7 @@ build:
 	docker-compose build x-mobility-map
 
 shell:
-	docker-compose run --rm -it -v $(CURDIR):/usr/src/mobility-map x-mobility-map
+	docker-compose run --rm -it -v $(CURDIR):/usr/src/mobility-map -p 3000:3000 x-mobility-map
 
 psql:
 	@echo "Connecting to postgis database..."
