@@ -2,301 +2,141 @@ local srid = 3857
 
 local tables = {}
 
-tables.points = osm2pgsql.define_node_table('osm_points', {
-    { column = 'tags', type = 'jsonb' },
-    { column = 'geom', type = 'point', projection = srid, not_null = true },
+tables.osm_counties = osm2pgsql.define_relation_table('osm_counties', {
+  { column = 'tags', type = 'jsonb' },
+  { column = 'ags', type = 'text'},
+  { column = 'name', type = 'text'},
+  { column = 'geom', type = 'geometry', projection = srid, not_null = true },
 })
 
-tables.lines = osm2pgsql.define_way_table('osm_lines', {
-    { column = 'tags', type = 'jsonb' },
-    { column = 'geom', type = 'linestring', projection = srid, not_null = true },
+tables.osm_states = osm2pgsql.define_relation_table('osm_states', {
+  { column = 'tags', type = 'jsonb' },
+  { column = 'ags', type = 'text'},
+  { column = 'name', type = 'text'},
+  { column = 'geom', type = 'geometry', projection = srid, not_null = true },
 })
 
-tables.polygons = osm2pgsql.define_area_table('osm_polygons', {
-    { column = 'tags', type = 'jsonb' },
-    { column = 'geom', type = 'geometry', projection = srid, not_null = true },
+tables.osm_buildings = osm2pgsql.define_way_table('osm_buildings', {
+  { column = 'id', sql_type = 'serial', create_only = true },
+  { column = 'tags', type = 'jsonb' },
+  { column = 'geom', type = 'geometry', projection = srid },
+  { column = 'center', type = 'point', projection = srid },
+  { column = 'units', type = 'int' },
+  { column = 'levels', type = 'int' },
+  { column = 'residential', type = 'bool' },
 })
 
-tables.routes = osm2pgsql.define_relation_table('osm_routes', {
-    { column = 'tags', type = 'jsonb' },
-    { column = 'geom', type = 'multilinestring', projection = srid, not_null = true },
+tables.osm_residental_areas = osm2pgsql.define_way_table('osm_residential_areas', {
+  { column = 'tags', type = 'jsonb' },
+  { column = 'geom', type = 'geometry', projection = srid, not_null = true },
 })
 
-tables.boundaries = osm2pgsql.define_relation_table('osm_boundaries', {
-    { column = 'tags', type = 'jsonb' },
-    { column = 'geom', type = 'multilinestring', projection = srid, not_null = true },
-})
+local address_cache = {}
 
-tables.osm_residential_buildings = osm2pgsql.define_way_table('osm_residential_buildings', {
-    { column = 'tags', type = 'jsonb' },
-    { column = 'geom', type = 'geometry', projection = srid },
-})
-
--- These tag keys are generally regarded as useless for most rendering. Most
--- of them are from imports or intended as internal information for mappers.
---
--- If a key ends in '*' it will match all keys with the specified prefix.
---
--- If you want some of these keys, perhaps for a debugging layer, just
--- delete the corresponding lines.
-local delete_keys = {
-    -- "mapper" keys
-    'attribution',
-    'comment',
-    'created_by',
-    'fixme',
-    'note',
-    'note:*',
-    'odbl',
-    'odbl:note',
-    'source',
-    'source:*',
-    'source_ref',
-
-    -- "import" keys
-
-    -- Corine Land Cover (CLC) (Europe)
-    'CLC:*',
-
-    -- Geobase (CA)
-    'geobase:*',
-    -- CanVec (CA)
-    'canvec:*',
-
-    -- osak (DK)
-    'osak:*',
-    -- kms (DK)
-    'kms:*',
-
-    -- ngbe (ES)
-    -- See also note:es and source:file above
-    'ngbe:*',
-
-    -- Friuli Venezia Giulia (IT)
-    'it:fvg:*',
-
-    -- KSJ2 (JA)
-    -- See also note:ja and source_ref above
-    'KSJ2:*',
-    -- Yahoo/ALPS (JA)
-    'yh:*',
-
-    -- LINZ (NZ)
-    'LINZ2OSM:*',
-    'linz2osm:*',
-    'LINZ:*',
-    'ref:linz:*',
-
-    -- WroclawGIS (PL)
-    'WroclawGIS:*',
-    -- Naptan (UK)
-    'naptan:*',
-
-    -- TIGER (US)
-    'tiger:*',
-    -- GNIS (US)
-    'gnis:*',
-    -- National Hydrography Dataset (US)
-    'NHD:*',
-    'nhd:*',
-    -- mvdgis (Montevideo, UY)
-    'mvdgis:*',
-
-    -- EUROSHA (Various countries)
-    'project:eurosha_2012',
-
-    -- UrbIS (Brussels, BE)
-    'ref:UrbIS',
-
-    -- NHN (CA)
-    'accuracy:meters',
-    'sub_sea:type',
-    'waterway:type',
-    -- StatsCan (CA)
-    'statscan:rbuid',
-
-    -- RUIAN (CZ)
-    'ref:ruian:addr',
-    'ref:ruian',
-    'building:ruian:type',
-    -- DIBAVOD (CZ)
-    'dibavod:id',
-    -- UIR-ADR (CZ)
-    'uir_adr:ADRESA_KOD',
-
-    -- GST (DK)
-    'gst:feat_id',
-
-    -- Maa-amet (EE)
-    'maaamet:ETAK',
-    -- FANTOIR (FR)
-    'ref:FR:FANTOIR',
-
-    -- 3dshapes (NL)
-    '3dshapes:ggmodelk',
-    -- AND (NL)
-    'AND_nosr_r',
-
-    -- OPPDATERIN (NO)
-    'OPPDATERIN',
-    -- Various imports (PL)
-    'addr:city:simc',
-    'addr:street:sym_ul',
-    'building:usage:pl',
-    'building:use:pl',
-    -- TERYT (PL)
-    'teryt:simc',
-
-    -- RABA (SK)
-    'raba:id',
-    -- DCGIS (Washington DC, US)
-    'dcgis:gis_id',
-    -- Building Identification Number (New York, US)
-    'nycdoitt:bin',
-    -- Chicago Building Inport (US)
-    'chicago:building_id',
-    -- Louisville, Kentucky/Building Outlines Import (US)
-    'lojic:bgnum',
-    -- MassGIS (Massachusetts, US)
-    'massgis:way_id',
-    -- Los Angeles County building ID (US)
-    'lacounty:*',
-    -- Address import from Bundesamt für Eich- und Vermessungswesen (AT)
-    'at_bev:addr_date',
-
-    -- misc
-    'import',
-    'import_uuid',
-    'OBJTYPE',
-    'SK53_bulk:load',
-    'mml:class'
-}
-
-local function is_residential(object)
-    local area = object.area_tags or {}
-    local residential_types = {
-        residential = true,
-        apartments = true,
-        house = true,
-        detached = true,
-        dormitory = true,
-        terrace = true,
-        bungalow = true,
-        static_caravan = true,
-    }
-    return residential_types[object.tags.building] ~= nil or area.landuse == 'residential'
+local function is_residential_building(object)
+  -- see: https://wiki.openstreetmap.org/wiki/Key:building?uselang=en
+  local residential_types = {
+    apartments = true,
+    barracks = true,
+    house = true,
+    detached = true,
+    semidetached_house = true,
+    dormitory = true,
+    terrace = true,
+    bungalow = true,
+    static_caravan = true,
+    residential = true,
+  }
+  return residential_types[object.tags.building] ~= nil
 end
 
 
+function estimate_levels(object)
+  local levels = 1
 
--- The osm2pgsql.make_clean_tags_func() function takes the list of keys
--- and key prefixes defined above and returns a function that can be used
--- to clean those tags out of a Lua table. The clean_tags function will
--- return true if it removed all tags from the table.
-local clean_tags = osm2pgsql.make_clean_tags_func(delete_keys)
+  if object.tags['building:levels'] then
+    levels = tonumber(object.tags['building:levels']) or 1
+  end
 
--- Helper function that looks at the tags and decides if this is possibly
--- an area.
-local function has_area_tags(tags)
-    if tags.area == 'yes' then
-        return true
-    end
-    if tags.area == 'no' then
-        return false
-    end
+  if object.tags['roof:levels'] then
+    levels = levels + (tonumber(object.tags['roof:levels']) or 0)
+  end
 
-    return tags.aeroway
-        or tags.amenity
-        or tags.building
-        or tags.harbour
-        or tags.historic
-        or tags.landuse
-        or tags.leisure
-        or tags.man_made
-        or tags.military
-        or tags.natural
-        or tags.office
-        or tags.place
-        or tags.power
-        or tags.public_transport
-        or tags.shop
-        or tags.sport
-        or tags.tourism
-        or tags.water
-        or tags.waterway
-        or tags.wetland
-        or tags['abandoned:aeroway']
-        or tags['abandoned:amenity']
-        or tags['abandoned:building']
-        or tags['abandoned:landuse']
-        or tags['abandoned:power']
-        or tags['area:highway']
-        or tags['building:part']
+  return levels
 end
+
+-- There are multiple houses availale which have are mapped as one building
+-- but are counted as multiple houses in for example the destatis database
+-- To more accurately map those houses, detect their house numbers as multiple
+-- to count them accordingly
+-- example: https://www.openstreetmap.org/way/98740315
+function estimate_units(object)
+  local units = 0
+
+  for _, id in ipairs(object.nodes) do
+    if address_cache[id] ~= nil then
+      units = units + 1
+    end
+  end
+
+  return (units == 0) and 1 or units
+end
+
 
 function osm2pgsql.process_node(object)
-    if clean_tags(object.tags) then
-        return
-    end
-
-    tables.points:insert({
-        tags = object.tags,
-        geom = object:as_point()
-    })
+  if object.tags['addr:housenumber'] then
+    address_cache[object.id] = true
+  end
 end
 
 function osm2pgsql.process_way(object)
-    if clean_tags(object.tags) then
-        return
-    end
 
-    if object.tags.building and is_residential(object) then
-      tables.osm_residential_buildings:insert({
-        tags = object.tags,
-        geom = object:as_polygon(),
-      })
-    end
+  if object.is_closed == false then
+    return
+  end
 
-    if object.is_closed and has_area_tags(object.tags) then
-        tables.polygons:insert({
-            tags = object.tags,
-            geom = object:as_polygon()
-        })
-    else
-        tables.lines:insert({
-            tags = object.tags,
-            geom = object:as_linestring()
-        })
-    end
+  if object.tags.landuse == 'residential' then
+    tables.osm_residental_areas:insert({
+      tags = object.tags,
+      geom = object:as_polygon(),
+    })
+  end
+
+  if object.tags.building then
+    res = is_residential_building(object)
+
+    tables.osm_buildings:insert({
+      tags = object.tags,
+      geom = object:as_polygon(),
+      center = object:as_polygon():centroid(),
+      units = estimate_units(object),
+      levels = estimate_levels(object),
+      residential = is_residential_building(object)
+,
+    })
+  end
 end
 
 function osm2pgsql.process_relation(object)
-    local relation_type = object:grab_tag('type')
+  if object.tags.boundary == 'administrative' then
+    local admin_level = object.tags.admin_level
 
-    if clean_tags(object.tags) then
-        return
+    if admin_level == '4' then
+      tables.osm_states:insert({
+        tags = object.tags,
+        ags = object.tags['de:amtlicher_gemeindeschluessel'],
+        name = object.tags.name,
+        geom = object:as_multipolygon()
+      })
     end
 
-    if relation_type == 'route' then
-        tables.routes:insert({
-            tags = object.tags,
-            geom = object:as_multilinestring()
-        })
-        return
+    if admin_level == '6' then
+      tables.osm_counties:insert({
+        tags = object.tags,
+        ags = object.tags['de:amtlicher_gemeindeschluessel'],
+        name = object.tags.name,
+        geom = object:as_multipolygon()
+      })
     end
-
-    if relation_type == 'boundary' or (relation_type == 'multipolygon' and object.tags.boundary) then
-        tables.boundaries:insert({
-            tags = object.tags,
-            geom = object:as_multilinestring():line_merge()
-        })
-        return
-    end
-
-    if relation_type == 'multipolygon' then
-        tables.polygons:insert({
-            tags = object.tags,
-            geom = object:as_multipolygon()
-        })
-    end
+  end
 end

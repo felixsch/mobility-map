@@ -27,7 +27,7 @@ migrate-database:
 	@echo "Migrating database.."
 	docker-compose run -it --rm db-migrator migrate-database
 
-import-osm-data: migrate-database
+import-osm-data:
 	@echo "Importing osm data.. This takes a while!"
 	docker-compose run --rm osm-importer       \
 		--database=${DATABASE_URL}         \

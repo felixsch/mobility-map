@@ -3,10 +3,12 @@ members = [
     "applications/migrate-database",
     "applications/import-gtfs-data",
     "applications/run-frontend",
+    "applications/run-county-analyzer",
 
     "components/common",
     "components/gtfs",
-]
+    "components/analyze-county", "applications/detect-residential-buildings",
+    ]
 
 resolver="2"
 

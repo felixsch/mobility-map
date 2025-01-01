@@ -1,17 +1,23 @@
 use crate::Result;
 use apalis::postgres::PostgresStorage;
-use sqlx::postgres::PgPoolOptions;
+use log::LevelFilter;
+use sqlx::postgres;
+use sqlx::ConnectOptions;
 use std::env;
+use std::time::Duration;
 
 pub use sqlx;
 pub type Pool = sqlx::PgPool;
 
 pub async fn connect() -> Result<Pool> {
     let url = env::var("DATABASE_URL").expect("no database connection URL specified");
+    let mut options: postgres::PgConnectOptions = url.parse()?;
 
-    let pool = PgPoolOptions::new()
+    options = options.log_slow_statements(LevelFilter::Info, Duration::from_secs(5));
+
+    let pool = postgres::PgPoolOptions::new()
         .max_connections(3)
-        .connect(&url)
+        .connect_with(options)
         .await?;
     Ok(pool)
 }

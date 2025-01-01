@@ -1,5 +1,6 @@
 use anyhow;
 
+pub mod batches;
 pub mod database;
 pub mod logging;
 
