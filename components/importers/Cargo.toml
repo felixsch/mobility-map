@@ -1,0 +1,16 @@
+[package]
+name = "import"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+common = { path = "../../components/common" }
+
+tokio.workspace     = true
+tracing.workspace   = true
+sqlx.workspace      = true
+itertools.workspace = true
+
+serde = { version = "1.0.215", features = ["derive"] }
+csv   = { version = "1.3.1" }
+zip   = { version = "2.2.1" }

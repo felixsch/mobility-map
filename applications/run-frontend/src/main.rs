@@ -4,10 +4,9 @@ use axum::{
     routing::get,
     Router,
 };
-use log::info;
-use tower_http::services::ServeDir;
 
-use common::logging;
+use tower_http::services::ServeDir;
+use tracing::info;
 
 #[derive(Template)]
 #[template(path = "index.html")]
@@ -20,7 +19,7 @@ async fn index() -> impl IntoResponse {
 
 #[tokio::main]
 async fn main() {
-    logging::init();
+    tracing_subscriber::fmt::init();
 
     info!("mounting assets..");
     // Serve static files from the "assets" directory

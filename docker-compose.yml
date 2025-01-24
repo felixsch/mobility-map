@@ -45,8 +45,7 @@ services:
         condition: service_healthy
 
   osm-importer:
-    <<: *one-shot
-    image: iboates/osm2pgsql:latest
+    <<: [*mobility-map, *one-shot]
     env_file: ".env"
     volumes:
       - ./data:/data

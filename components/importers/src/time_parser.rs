@@ -1,7 +1,7 @@
 pub mod messy_time {
-    use chrono::NaiveTime;
     use serde::de::{self, Visitor};
     use serde::{self, Deserializer};
+    use sqlx::types::chrono::NaiveTime;
     use std::fmt;
 
     struct NaiveTimeVisitor;

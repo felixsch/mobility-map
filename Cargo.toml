@@ -1,16 +1,32 @@
 [workspace]
 members = [
     "applications/migrate-database",
+    "applications/import-osm-data",
     "applications/import-gtfs-data",
+    # "applications/analyze-residential-buildings",
+    # "applications/analyze-stops",
+    # "applications/analyze-counties",
+    # "applications/analyze-states",
+    # "applications/analyze-country",
     "applications/run-frontend",
-    "applications/run-county-analyzer",
+    # "applications/run-csv-exporter",
 
     "components/common",
-    "components/gtfs",
-    "components/analyze-county", "applications/detect-residential-buildings",
+    "components/importers",
+    "components/analyzers",
+    # "components/cli",
     ]
-
 resolver="2"
+
+[workspace.dependencies]
+log                = { version = "0.4.22" }
+tracing            = { version = "0.1.40" }
+tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
+tokio              = { version = "1",      features = ["full"] }
+sqlx               = { version = "0.8",    features = [ "runtime-tokio", "postgres" ] }
+apalis             = { version = "0.5.5",  features = ["postgres"] }
+anyhow             = { version = "1.0.93", features = ["std", "backtrace"] }
+itertools          = { version = "0.14.0" }
 
 [profile.dev]
 opt-level = 0

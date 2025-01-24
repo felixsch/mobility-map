@@ -1,18 +1,20 @@
 use common::database;
-use common::logging;
 use common::Result;
 
-use log::{error, info};
+use tracing::{info, error};
 use std::process;
+use std::env;
 
 #[tokio::main]
 async fn main() {
-    logging::init();
+    tracing_subscriber::fmt::init();
+
+    let url = env::var("DATABASE_URL").expect("no database connection URL specified");
 
     info!("Running migrations!");
 
     let result: Result<()> = async {
-        let pool = database::connect().await?;
+        let pool = database::connect(&url).await?;
 
         database::migrate_job_queue(&pool).await?;
         database::migrate_tables(&pool).await?;

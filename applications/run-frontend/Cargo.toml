@@ -6,11 +6,13 @@ edition = "2021"
 [dependencies]
 common = { path = "../../components/common" }
 
-tokio = { version = "1", features = ["full"] }
-askama = { version = "0.12.1", features = ["with-axum"] }
-askama_axum = "0.4.0"
-axum = { version = "0.7.4", features = ["ws"] }
-sqlx = { version = "0.8", features = [ "runtime-tokio", "postgres" ] }
-tower-http = { version = "0.6.2", features = ["fs"] }
-log = "0.4.22"
-geojson = "0.24.1"
+tokio.workspace              = true
+sqlx.workspace               = true
+tracing.workspace            = true
+tracing-subscriber.workspace = true
+
+axum        = { version = "0.7.4", features = ["ws"] }
+askama      = { version = "0.12.1", features = ["with-axum"] }
+askama_axum = { version = "0.4.0" }
+tower-http  = { version = "0.6.2", features = ["fs"] }
+geojson     = { version = "0.24.1" }

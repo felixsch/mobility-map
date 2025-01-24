@@ -28,14 +28,8 @@ migrate-database:
 	docker-compose run -it --rm db-migrator migrate-database
 
 import-osm-data:
-	@echo "Importing osm data.. This takes a while!"
-	docker-compose run --rm osm-importer       \
-		--database=${DATABASE_URL}         \
-		--create                           \
-		--prefix osm                       \
-		--output=flex                      \
-		--style=/config/mobility-flex.lua  \
-		${EXTRACT_FILE}
+	@echo "importing osm data.. this takes a while!"
+	docker-compose run --rm osm-importer import-osm-data
 
 import-gtfs-data: migrate-database
 	@echo "Importing gtfs data.. This takes a while!"

@@ -3,16 +3,15 @@ use apalis::postgres::PostgresStorage;
 use log::LevelFilter;
 use sqlx::postgres;
 use sqlx::ConnectOptions;
-use std::env;
+use tracing;
 use std::time::Duration;
 
 pub use sqlx;
 pub type Pool = sqlx::PgPool;
 
-pub async fn connect() -> Result<Pool> {
-    let url = env::var("DATABASE_URL").expect("no database connection URL specified");
+#[tracing::instrument]
+pub async fn connect(url: &str) -> Result<Pool> {
     let mut options: postgres::PgConnectOptions = url.parse()?;
-
     options = options.log_slow_statements(LevelFilter::Info, Duration::from_secs(5));
 
     let pool = postgres::PgPoolOptions::new()
@@ -22,6 +21,7 @@ pub async fn connect() -> Result<Pool> {
     Ok(pool)
 }
 
+#[tracing::instrument]
 pub async fn migrate_job_queue(conn: &Pool) -> Result<()> {
     let mut migrator = PostgresStorage::migrations();
 
@@ -34,6 +34,7 @@ pub async fn migrate_job_queue(conn: &Pool) -> Result<()> {
     Ok(())
 }
 
+#[tracing::instrument]
 pub async fn migrate_tables(conn: &Pool) -> Result<()> {
     // Same as above. There should be an table name option and
     // not have it hardcoded

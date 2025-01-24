@@ -1,11 +1,12 @@
 [package]
-name = "import-gtfs-data"
+name = "import-osm-data"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
 common  = { path = "../../components/common" }
 import  = { path = "../../components/importers" }
+analyze = { path = "../../components/analyzers" }
 
 tokio.workspace              = true
 tracing-subscriber.workspace = true

@@ -3,7 +3,7 @@ WORKDIR /build
 
 RUN cargo install cargo-chef
 RUN apt-get update && \
-    apt-get install -y jq && \
+    apt-get install -y jq osm2pgsql vim curl wget && \
     rm -rf /var/lib/apt/lists/*
 
 FROM base AS dependencies
