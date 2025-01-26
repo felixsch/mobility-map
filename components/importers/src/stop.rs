@@ -30,10 +30,10 @@ impl Stop {
         builder.push_values(batch, |mut b, stop| {
             b.push_bind(&stop.id)
                 .push_bind(&stop.name)
-                .push("ST_SetSRID(ST_MakePoint(")
-                .push_bind_unseparated(stop.lat)
-                .push_bind(stop.lon)
-                .push_unseparated("), 4326)");
+                .push("ST_Transform(ST_SetSRID(ST_MakePoint(")
+                .push_bind_unseparated(stop.lon)
+                .push_bind(stop.lat)
+                .push_unseparated("), 4326), 3857)");
         });
         builder.push(
             " ON CONFLICT (id) DO UPDATE SET name = excluded.name, location = excluded.location",

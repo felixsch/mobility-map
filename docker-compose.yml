@@ -48,7 +48,7 @@ services:
     <<: [*mobility-map, *one-shot]
     env_file: ".env"
     volumes:
-      - ./data:/data
+      - ./data:/usr/src/mobility-map/data
       - ./scripts/mobility-flex.lua:/config/mobility-flex.lua
     depends_on:
       postgis:

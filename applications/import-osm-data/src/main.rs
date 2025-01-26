@@ -7,10 +7,13 @@ use import;
 use std::env;
 use std::process;
 use tracing::{error, info};
+use tracing_subscriber::EnvFilter;
 
 #[tokio::main]
 async fn main() {
-    tracing_subscriber::fmt().init();
+    tracing_subscriber::fmt()
+        .with_env_filter(EnvFilter::from_default_env())
+        .init();
 
     let url = env::var("DATABASE_URL").expect("no database connection URL specified");
     let extract_file_path = env::var("EXTRACT_FILE").expect("no OSM extract file specified.");

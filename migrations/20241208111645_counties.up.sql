@@ -11,7 +11,7 @@ RETURNS TABLE(name TEXT, geom GEOMETRY) AS $$
 BEGIN
     RETURN QUERY
     SELECT b.name, b.geom
-    FROM osm_counies b
+    FROM osm_counties b
     WHERE b.asg = asg
     LIMIT 1;
 END;

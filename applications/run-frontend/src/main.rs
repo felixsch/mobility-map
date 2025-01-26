@@ -7,6 +7,7 @@ use axum::{
 
 use tower_http::services::ServeDir;
 use tracing::info;
+use tracing_subscriber::EnvFilter;
 
 #[derive(Template)]
 #[template(path = "index.html")]
@@ -19,7 +20,9 @@ async fn index() -> impl IntoResponse {
 
 #[tokio::main]
 async fn main() {
-    tracing_subscriber::fmt::init();
+    tracing_subscriber::fmt()
+        .with_env_filter(EnvFilter::from_default_env())
+        .init();
 
     info!("mounting assets..");
     // Serve static files from the "assets" directory

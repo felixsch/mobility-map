@@ -8,3 +8,5 @@ common = { path = "../../components/common" }
 
 tracing.workspace = true
 sqlx.workspace    = true
+
+futures = { version = "0.3.31" }

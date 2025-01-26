@@ -11,7 +11,7 @@ ALTER TABLE stop_times ADD CONSTRAINT unique_stop_times UNIQUE (trip_id, stop_id
 CREATE TABLE stops (
     id VARCHAR(255) PRIMARY KEY,
     name VARCHAR(255),
-    location GEOMETRY(Point, 4326)
+    location GEOMETRY(Point, 3857)
 );
 
 CREATE INDEX idx_stop_times_stop_id ON stop_times (stop_id);
