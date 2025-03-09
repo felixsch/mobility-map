@@ -37,7 +37,7 @@ async fn main() {
     .await;
 
     match result {
-        Ok(_) => info!("import OSM data complete!"),
+        Ok(_) => info!("import GTFS data complete!"),
         Err(err) => {
             error!("Import failed: {}", err);
             process::exit(1)

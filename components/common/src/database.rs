@@ -1,10 +1,10 @@
 use crate::Result;
-use apalis::postgres::PostgresStorage;
+use apalis_sql::postgres::*;
 use log::LevelFilter;
 use sqlx::postgres;
 use sqlx::ConnectOptions;
-use tracing;
 use std::time::Duration;
+use tracing;
 
 pub use sqlx;
 pub type Pool = sqlx::PgPool;

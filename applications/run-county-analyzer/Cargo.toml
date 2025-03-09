@@ -1,0 +1,19 @@
+[package]
+name = "run-county-analyzer"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+common  = { path = "../../components/common" }
+analyze  = { path = "../../components/analyzers" }
+
+tokio.workspace              = true
+tracing-subscriber.workspace = true
+tracing.workspace            = true
+
+apalis.workspace             = true
+apalis-sql.workspace         = true
+uuid.workspace               = true
+serde.workspace              = true
+
+clap = { version = "4.5.27", features = ["derive"] }

@@ -23,6 +23,7 @@ enum Commands {
     Analyze { ifopt: String },
 }
 
+
 async fn analyze_single(pool: &Pool, ifopt: String) -> Result<()> {
     info!("analyzing stop `{}`..", ifopt);
 

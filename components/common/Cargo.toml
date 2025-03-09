@@ -9,4 +9,5 @@ sqlx.workspace = true
 tracing.workspace = true
 log.workspace = true
 apalis.workspace = true
+apalis-sql.workspace = true
 anyhow.workspace = true
