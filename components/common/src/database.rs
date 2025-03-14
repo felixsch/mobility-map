@@ -1,13 +1,51 @@
-use crate::Result;
+use crate::{BoxDynError, Result, StdResult};
+use anyhow::anyhow;
 use apalis_sql::postgres::*;
+use futures::future::BoxFuture;
 use log::LevelFilter;
+use sqlx::migrate::{Migration, MigrationSource, Migrator};
 use sqlx::postgres;
 use sqlx::ConnectOptions;
+use std::path::Path;
 use std::time::Duration;
-use tracing;
+use tracing::info;
 
 pub use sqlx;
 pub type Pool = sqlx::PgPool;
+
+#[derive(Debug, Clone)]
+struct MergedMigrations {
+    sources: Vec<Vec<Migration>>,
+}
+
+impl MergedMigrations {
+    fn new() -> Self {
+        MergedMigrations {
+            sources: Vec::new(),
+        }
+    }
+
+    fn add_source(mut self, source: Vec<Migration>) -> Self {
+        self.sources.push(source);
+        self
+    }
+}
+
+impl<'s> MigrationSource<'s> for MergedMigrations {
+    fn resolve(self) -> BoxFuture<'s, StdResult<Vec<Migration>, BoxDynError>> {
+        Box::pin(async move {
+            let mut all: Vec<Migration> = self
+                .sources
+                .into_iter()
+                .flatten()
+                .filter(|m| m.migration_type.is_up_migration())
+                .collect();
+            all.sort_by_key(|m| m.version);
+
+            Ok(all)
+        })
+    }
+}
 
 #[tracing::instrument]
 pub async fn connect(url: &str) -> Result<Pool> {
@@ -22,26 +60,30 @@ pub async fn connect(url: &str) -> Result<Pool> {
 }
 
 #[tracing::instrument]
-pub async fn migrate_job_queue(conn: &Pool) -> Result<()> {
-    let mut migrator = PostgresStorage::migrations();
+pub async fn migrate(pool: &Pool) -> Result<()> {
+    let apalis: Vec<Migration> = PostgresStorage::migrations().migrations.into_owned();
 
-    // Currently sqlx lacks support for multiple migrations
-    // but this is neede here so we ignore everything for now
-    // until https://github.com/geofmureithi/apalis/issues/439
-    // is actually addressded
-    // FIXME: Check if there is a better solution now!
-    migrator.set_ignore_missing(true).run(conn).await?;
-    Ok(())
-}
+    let mobility: Vec<Migration> = Path::new("migrations")
+        .resolve()
+        .await
+        .map_err(|e| anyhow!("loading migrations: {}", e))?;
 
-#[tracing::instrument]
-pub async fn migrate_tables(conn: &Pool) -> Result<()> {
-    // Same as above. There should be an table name option and
-    // not have it hardcoded
-    // See: https://github.com/launchbadge/sqlx/issues/1698
-    sqlx::migrate!("../../migrations/")
-        .set_ignore_missing(true)
-        .run(conn)
-        .await?;
-    Ok(())
+    let migrations: MergedMigrations = MergedMigrations::new()
+        .add_source(mobility)
+        .add_source(apalis);
+
+    migrations
+        .clone()
+        .resolve()
+        .await
+        .map_err(|e| anyhow!("loading migrations: {}", e))?
+        .iter()
+        .for_each(|m| info!("  {} {}", m.version, m.description));
+
+    let migrator = Migrator::new(migrations).await?;
+
+    migrator
+        .run(pool)
+        .await
+        .map_err(|e| anyhow!("migrator: {}", e))
 }

@@ -2,7 +2,8 @@ use common::database;
 use common::database::Pool;
 use common::Result;
 
-use analyze;
+use jobs::job::Job;
+use jobs::stop::AnalyzeStopJob;
 
 use clap::{Parser, Subcommand};
 use std::env;
@@ -23,20 +24,6 @@ enum Commands {
     Analyze { ifopt: String },
 }
 
-
-async fn analyze_single(pool: &Pool, ifopt: String) -> Result<()> {
-    info!("analyzing stop `{}`..", ifopt);
-
-    analyze::stop::calculate_cycle(pool, &ifopt).await?;
-    analyze::stop::calculate_stats_by_distances(pool, &ifopt, common::DISTANCES.into()).await?;
-
-    Ok(())
-}
-
-async fn run_worker(_pool: &Pool) -> Result<()> {
-    Ok(())
-}
-
 #[tokio::main]
 async fn main() {
     tracing_subscriber::fmt()
@@ -50,8 +37,10 @@ async fn main() {
         let pool = database::connect(&url).await?;
 
         return match &cli.command {
-            Some(Commands::Analyze { ifopt }) => analyze_single(&pool, ifopt.clone()).await,
-            None => run_worker(&pool).await,
+            Some(Commands::Analyze { ifopt }) => {
+                AnalyzeStopJob::from(ifopt.clone()).perform_job(&pool).await
+            }
+            None => AnalyzeStopJob::spawn_worker(pool).await,
         };
     }
     .await;

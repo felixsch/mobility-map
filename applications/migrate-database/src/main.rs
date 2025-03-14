@@ -19,8 +19,7 @@ async fn main() {
     let result: Result<()> = async {
         let pool = database::connect(&url).await?;
 
-        database::migrate_job_queue(&pool).await?;
-        database::migrate_tables(&pool).await?;
+        database::migrate(&pool).await?;
 
         Ok(())
     }

@@ -13,6 +13,7 @@ members = [
     "components/common",
     "components/importers",
     "components/analyzers",
+    "components/jobs",
     # "components/cli",
     ]
 resolver="2"
@@ -24,11 +25,12 @@ tracing-subscriber = { version = "0.3.18",  features = ["env-filter"] }
 uuid               = { version = "1.15.1",  features = ["v4"] }
 tokio              = { version = "1",       features = ["full"] }
 sqlx               = { version = "0.8",     features = [ "runtime-tokio", "postgres" ] }
-apalis             = { version = "0.6.4" }
+apalis             = { version = "0.6.4",   features = ["tracing", "catch-panic"] }
 apalis-sql         = { version = "0.6.4",   features = [ "postgres" ] }
 anyhow             = { version = "1.0.93",  features = ["std", "backtrace"] }
 itertools          = { version = "0.14.0" }
 serde              = { version = "1.0.215", features = ["derive"] }
+futures            = { version = "0.3.31" }
 
 [profile.dev]
 opt-level = 0

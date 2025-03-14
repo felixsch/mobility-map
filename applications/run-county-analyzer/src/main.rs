@@ -1,10 +1,11 @@
 use common::database;
-use common::database::Pool;
 use common::Result;
 
-use analyze;
+use jobs::county::AnalyzeCountyJob;
+use jobs::job::Job;
 
 use clap::{Parser, Subcommand};
+use std::convert::From;
 use std::env;
 use std::process;
 use tracing::{error, info};
@@ -23,56 +24,6 @@ enum Commands {
     Analyze { ags: String },
 }
 
-// COMMON
-use apalis::prelude::*;
-use apalis_sql::postgres::PostgresStorage;
-use serde::{Deserialize, Serialize};
-use std::sync::Arc;
-
-//---
-
-#[derive(Clone, Serialize, Deserialize)]
-struct AnalyzeCounty {
-    ags: String,
-}
-
-async fn analyze_single(pool: &Pool, ags: String) -> Result<()> {
-    info!("analyzing county `{}`..", ags);
-
-    let stops: Vec<i64> = analyze::county::fetch_stops_within_county(pool, &ags).await?;
-
-    stops.into_iter().for_each(|id| {
-        info!("enqueued stop {}..", id);
-    });
-
-    Ok(())
-}
-
-async fn run_worker(pool: Pool) -> Result<()> {
-    info!("starting worker: county-analyzer...");
-
-    PostgresStorage::setup(&pool).await.unwrap();
-
-    let pg: PostgresStorage<AnalyzeCounty> = PostgresStorage::new(pool.clone());
-
-    async fn analyze(job: AnalyzeCounty, pool: Data<Pool>) -> Result<(), Error> {
-        analyze_single(&pool, job.ags)
-            .await
-            .map_err(|e| apalis::prelude::Error::Failed(Arc::new(e.into())))
-    }
-
-    Monitor::new()
-        .register({
-            WorkerBuilder::new(&format!("analyze-county"))
-                .data(pool.clone())
-                .backend(pg)
-                .build_fn(analyze)
-        })
-        .run()
-        .await?;
-    Ok(())
-}
-
 #[tokio::main]
 async fn main() {
     tracing_subscriber::fmt()
@@ -86,8 +37,10 @@ async fn main() {
         let pool = database::connect(&url).await?;
 
         return match &cli.command {
-            Some(Commands::Analyze { ags }) => analyze_single(&pool, ags.clone()).await,
-            None => run_worker(pool).await,
+            Some(Commands::Analyze { ags }) => {
+                AnalyzeCountyJob::from(ags.clone()).perform_job(&pool).await
+            }
+            None => AnalyzeCountyJob::spawn_worker(pool).await,
         };
     }
     .await;

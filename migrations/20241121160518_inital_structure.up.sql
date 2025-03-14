@@ -1,5 +1,3 @@
-CREATE EXTENSION IF NOT EXISTS postgis;
-
 CREATE TABLE stop_times (
     trip_id VARCHAR(255),
     stop_id VARCHAR(255),

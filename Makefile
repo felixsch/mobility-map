@@ -4,16 +4,27 @@ ifneq (,$(wildcard ./.env))
     export
 endif
 
-.PHONY: build psql clean confirm_clean import-osm-data import-gtfs-data migrate-database run-frontend
+SOURCES := $(shell find . -name '*.rs')
+MIGRATIONS := $(shell find ./migrations/ -name '*.sql')
 
-build:
+.PHONY: psql clean database-up shell confirm_clean import-% run-%
+
+build: $(SOURCES)
+	@echo "BUILD"
 	docker-compose build x-mobility-map
 
-shell:
-	docker-compose run --rm -it -v $(CURDIR):/usr/src/mobility-map -p 3000:3000 x-mobility-map
+migrate: $(MIGRATIONS)
+	@echo "MIGRATION"
+	docker-compose run -it --rm db-migrator migrate-database
+
+database-up:
+	docker-compose up postgis -d
+
+
+shell: build database-up migrate
+	docker-compose run --rm -it -v $(CURDIR):/mobility-map -w /mobility-map x-mobility-map
 
 psql:
-	@echo "Connecting to postgis database..."
 	docker-compose exec -ti postgis psql -U ${POSTGRES_USER}
 
 confirm_clean:
@@ -23,19 +34,11 @@ clean: confirm_clean
 	@echo "Removing all data.."
 	docker-compose down -v --remove-orphans
 
-migrate-database:
-	@echo "Migrating database.."
-	docker-compose run -it --rm db-migrator migrate-database
+import-%: build database-up migrate
+	docker-compose run --rm -it importer import-$*
 
-import-osm-data:
-	@echo "importing osm data.. this takes a while!"
-	docker-compose run --rm osm-importer import-osm-data
+run-%: build database-up migrate
+	docker-compose run --rm -it x-mobility-map run-$*
 
-import-gtfs-data: migrate-database
-	@echo "Importing gtfs data.. This takes a while!"
-	docker-compose run --rm gtfs-importer import-gtfs-data
-
-run-frontend: migrate-database
-	@echo "Running frontend node"
-	docker-compose run --rm frontend run-frontend
-	
+frontend: build database-up migrate
+	docker-compose run --rm -it -p 3000:3000 x-mobility-map run-frontend

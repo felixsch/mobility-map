@@ -36,29 +36,11 @@ services:
       postgis:
         condition: service_healthy
 
-  gtfs-importer:
+  importer:
     <<: [*mobility-map, *one-shot]
-    volumes:
-      - ./data:/usr/src/mobility-map/data
-    depends_on:
-      postgis:
-        condition: service_healthy
-
-  osm-importer:
-    <<: [*mobility-map, *one-shot]
-    env_file: ".env"
     volumes:
       - ./data:/usr/src/mobility-map/data
       - ./scripts/mobility-flex.lua:/config/mobility-flex.lua
-    depends_on:
-      postgis:
-        condition: service_healthy
-
-  frontend:
-    <<: *mobility-map
-    command: frontend-worker
-    ports:
-      - "3000:3000"
     depends_on:
       postgis:
         condition: service_healthy

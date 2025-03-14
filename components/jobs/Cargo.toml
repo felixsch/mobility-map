@@ -1,14 +1,18 @@
 [package]
-name = "common"
+name = "jobs"
 version = "0.0.1"
 edition = "2021"
 
 [dependencies]
+common  = { path = "../../components/common" }
+analyze  = { path = "../../components/analyzers" }
+
 tokio.workspace = true
 sqlx.workspace = true
 tracing.workspace = true
 log.workspace = true
 apalis.workspace = true
 apalis-sql.workspace = true
+serde.workspace = true
 anyhow.workspace = true
 futures.workspace = true

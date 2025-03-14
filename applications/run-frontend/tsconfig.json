@@ -8,7 +8,7 @@
     "skipLibCheck": true,                                 /* Skip type checking all .d.ts files. */
 
     "rootDir": "./src/typescript",
-    "outDir": "./static/js"
+    "outDir": "./assets/js"
   },
 
   "include": ["src/typescript/**/*"]

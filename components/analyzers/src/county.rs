@@ -1,17 +1,19 @@
 use common::database::Pool;
 use common::Result;
 
-pub async fn fetch_stops_within_county(pool: &Pool, ags: &str) -> Result<Vec<i64>> {
-    let stops: Vec<String> = sqlx::query_as(
+pub async fn fetch_stops_within_county(pool: &Pool, ags: &str) -> Result<Vec<String>> {
+    let stops: Vec<String> = sqlx::query_as::<_, (String,)>(
         " WITH county AS (
           SELECT ags, geom FROM osm_counties
             WHERE ags = $1
-        ) SELECT id FROM counties_within(county.geom) ",
+        ) SELECT id FROM stops_within((SELECT geom FROM county)::geometry)",
     )
     .bind(ags)
     .fetch_all(pool)
-    .await?;
+    .await?
+    .into_iter()
+    .map(|rec| rec.0)
+    .collect();
 
-    let mut stop_ids = Vec::new();
-    Ok(stop_ids)
+    Ok(stops)
 }

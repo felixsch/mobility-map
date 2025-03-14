@@ -1,0 +1,9 @@
+#!/bin/bash
+
+set -e
+echo "building assets.."
+
+pushd applications/run-frontend
+
+yarn install
+yarn build

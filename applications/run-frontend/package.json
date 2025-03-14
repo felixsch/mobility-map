@@ -3,6 +3,7 @@
   "packageManager": "yarn@4.5.3",
   "dependencies": {
     "bootstrap": "^5.3.3",
+    "leaflet": "^1.9.4",
     "sass": "^1.81.0",
     "typescript": "^5.7.2"
   },
@@ -13,5 +14,8 @@
     "watch:scss": "sass --watch src/scss/style.scss:static/css/style.css",
     "watch:ts": "tsc --watch",
     "watch": "yarn watch:scss & yarn watch:ts"
+  },
+  "devDependencies": {
+    "@types/leaflet": "^1.9.16"
   }
 }
