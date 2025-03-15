@@ -30,6 +30,7 @@ apalis-sql         = { version = "0.6.4",   features = [ "postgres" ] }
 anyhow             = { version = "1.0.93",  features = ["std", "backtrace"] }
 itertools          = { version = "0.14.0" }
 serde              = { version = "1.0.215", features = ["derive"] }
+serde_json         = { version = "1.0.140" }
 futures            = { version = "0.3.31" }
 
 [profile.dev]
