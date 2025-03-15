@@ -3,7 +3,5 @@
 set -e
 echo "building assets.."
 
-pushd applications/run-frontend
-
-yarn install
-yarn build
+pushd applications/run-frontend &> /dev/null
+npm run build

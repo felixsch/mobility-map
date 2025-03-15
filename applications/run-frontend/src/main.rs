@@ -26,7 +26,7 @@ async fn main() {
 
     info!("mounting assets..");
     // Serve static files from the "assets" directory
-    let serve_dir = ServeDir::new("applications/run-frontend/static");
+    let serve_dir = ServeDir::new("applications/run-frontend/assets");
 
     info!("mounting app..");
     // Build our application with some routes

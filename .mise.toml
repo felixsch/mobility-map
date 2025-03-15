@@ -1,6 +1,6 @@
 [tools]
 rust = "1.82"
-yarn = "4.5.3"
+node = "23.10.0"
 
 [env]
 _.file = '.env'

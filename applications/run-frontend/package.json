@@ -1,21 +1,26 @@
 {
   "name": "run-frontend",
-  "packageManager": "yarn@4.5.3",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "rollup -c",
+    "start": "rollup -c -w"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
   "dependencies": {
     "bootstrap": "^5.3.3",
-    "leaflet": "^1.9.4",
-    "sass": "^1.81.0",
-    "typescript": "^5.7.2"
-  },
-  "scripts": {
-    "build:scss": "sass --quiet -I $(pwd)/node_modules -I $(pwd)/src/scss src/scss/style.scss static/css/style.css",
-    "build:ts": "tsc",
-    "build": "yarn build:scss && yarn build:ts",
-    "watch:scss": "sass --watch src/scss/style.scss:static/css/style.css",
-    "watch:ts": "tsc --watch",
-    "watch": "yarn watch:scss & yarn watch:ts"
+    "leaflet": "^1.9.4"
   },
   "devDependencies": {
-    "@types/leaflet": "^1.9.16"
+    "@rollup/plugin-commonjs": "^28.0.3",
+    "@rollup/plugin-node-resolve": "^16.0.1",
+    "@types/leaflet": "^1.9.16",
+    "rollup": "^4.35.0",
+    "rollup-plugin-postcss": "^4.0.2",
+    "rollup-plugin-typescript2": "^0.36.0",
+    "sass": "^1.85.1"
   }
 }
