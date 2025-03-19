@@ -1,7 +1,6 @@
-use common::database::Pool;
-use common::Result;
+use common::prelude::*;
 
-pub async fn fetch_stops_within_county(pool: &Pool, ags: &str) -> Result<Vec<String>> {
+pub async fn fetch_stops_within_county(pool: &Pool, ags: &str) -> Result<Vec<String>, BoxDynError> {
     let stops: Vec<String> = sqlx::query_as::<_, (String,)>(
         " WITH county AS (
           SELECT ags, geom FROM osm_counties

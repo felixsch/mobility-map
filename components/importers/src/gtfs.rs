@@ -1,19 +1,16 @@
-use common::database::Pool;
-use common::Result;
-use common::Timer;
-
-use std::io::{Read, Seek};
-use tracing::info;
-use zip::read::ZipArchive;
-
 use crate::stop::import_stops;
 use crate::stop_time::import_stop_times;
+
+use common::prelude::*;
+use common::Timer;
+
+use zip::read::ZipArchive;
 
 pub async fn import_gtfs_data<R: Read + Seek>(
     pool: &Pool,
     archive_hdl: R,
     batch_size: usize,
-) -> Result<Timer> {
+) -> Result<Timer, BoxDynError> {
     let mut timer = Timer::new();
     timer.start_ticking();
 

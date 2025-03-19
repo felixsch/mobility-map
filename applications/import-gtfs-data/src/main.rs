@@ -1,10 +1,9 @@
 use common::database;
-use common::Result;
+use common::prelude::*;
 
 use import;
 
 use std::env;
-use std::fs::File;
 use std::process;
 use tracing::{error, info};
 use tracing_subscriber::EnvFilter;
@@ -24,7 +23,7 @@ async fn main() {
 
     info!("Import GTFS data from archive");
 
-    let result: Result<()> = async {
+    let result: NoResult = async {
         let pool = database::connect(&url).await?;
         let archive = File::open(gtfs_file_path)?;
 

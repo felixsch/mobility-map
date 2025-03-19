@@ -1,12 +1,12 @@
 use common::database;
-use common::{Result, Timer};
+use common::prelude::*;
+use common::Timer;
 
 use analyze;
 use import;
 
 use std::env;
 use std::process;
-use tracing::{error, info};
 use tracing_subscriber::EnvFilter;
 
 #[tokio::main]
@@ -24,7 +24,7 @@ async fn main() {
 
     info!("Import OSM data from extract file");
 
-    let result: Result<()> = async {
+    let result: NoResult = async {
         let mut timer = Timer::new();
         timer.start_ticking();
 

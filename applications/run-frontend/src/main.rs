@@ -6,18 +6,17 @@ use axum::{
     routing::get,
     Router,
 };
-use common::database::{connect, Pool};
-use common::Result;
 
-use geojson::{Feature, FeatureCollection, GeoJson, Geometry, Value};
+use common::database::connect;
+use common::prelude::*;
 
-use serde::Deserialize;
+use geojson::{Feature, FeatureCollection, GeoJson, Geometry};
+
 use sqlx::Row;
 use std::env;
 use std::process;
 
 use tower_http::services::ServeDir;
-use tracing::{error, info};
 use tracing_subscriber::EnvFilter;
 
 #[derive(Template)]
@@ -66,7 +65,7 @@ async fn accessible_area(
         StatusCode::INTERNAL_SERVER_ERROR
     })?;
 
-    let all_geometry: Result<Vec<Geometry>, geojson::Error> = rows
+    let all_geometry: std::result::Result<Vec<Geometry>, geojson::Error> = rows
         .into_iter()
         .map(|row| {
             let data: String = row.get("geojson");
@@ -113,7 +112,7 @@ async fn main() {
     let serve_dir = ServeDir::new("applications/run-frontend/assets");
     let url = env::var("DATABASE_URL").expect("no database connection URL specified");
 
-    let result: Result<()> = async {
+    let result: NoResult = async {
         let pool: Pool = connect(&url).await?;
         let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await?;
 

@@ -1,12 +1,8 @@
-use common::database::Pool;
-use common::Result;
+use common::prelude::*;
 
 use itertools::Itertools;
-use serde::Deserialize;
 use sqlx::types::chrono::NaiveTime;
 use sqlx::{Execute, Postgres, QueryBuilder};
-use std::io::Read;
-use tracing::debug;
 
 use crate::time_parser;
 
@@ -26,7 +22,7 @@ pub struct StopTime {
 }
 
 impl StopTime {
-    async fn update_or_create_batch(pool: &Pool, batch: &Vec<StopTime>) -> Result<()> {
+    async fn update_or_create_batch(pool: &Pool, batch: &Vec<StopTime>) -> NoResult {
         let mut builder: QueryBuilder<Postgres> =
             QueryBuilder::new("INSERT INTO stop_times (trip_id, stop_id, arrival, departure)");
 
@@ -52,14 +48,16 @@ pub async fn import_stop_times<R: Read>(
     pool: &Pool,
     reader: R,
     batch_size: usize,
-) -> Result<usize> {
+) -> Result<usize, BoxDynError> {
+    type Batch = std::result::Result<Vec<StopTime>, csv::Error>;
+
     let mut file = csv::Reader::from_reader(reader);
     let mut total = 0;
 
     let stop_times = file.deserialize();
 
     for chunk in &stop_times.chunks(batch_size) {
-        let batch = chunk.collect::<Result<Vec<StopTime>, _>>()?;
+        let batch = chunk.collect::<Batch>()?;
 
         StopTime::update_or_create_batch(pool, &batch).await?;
         total += batch.len();

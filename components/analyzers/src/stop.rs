@@ -1,10 +1,7 @@
-use common::database::Pool;
-use common::Result;
+use common::prelude::*;
 
-use futures::future::{try_join_all, BoxFuture, FutureExt};
+use futures::future::try_join_all;
 use sqlx;
-use sqlx::Execute;
-use tracing::debug;
 
 #[derive(Clone)]
 struct StopStats {
@@ -16,7 +13,7 @@ struct StopStats {
     residents: i64,
 }
 
-pub async fn calculate_cycle(pool: &Pool, ifopt: &str) -> Result<()> {
+pub async fn calculate_cycle(pool: &Pool, ifopt: &str) -> NoResult {
     debug!("calculating average cycle time for {}", ifopt);
 
     sqlx::query(
@@ -35,13 +32,13 @@ pub async fn calculate_stats_by_distances(
     pool: &Pool,
     ifopt: &str,
     distances: Vec<usize>,
-) -> Result<()> {
+) -> NoResult {
     debug!(
         "calculating residents stats for {} (distances: {:?})",
         ifopt, distances
     );
 
-    let futures = distances.into_iter().map(|distance| -> BoxFuture<Result<StopStats>> {
+    let futures = distances.into_iter().map(|distance| -> BoxFuture<Result<StopStats, BoxDynError>> {
         async move {
             let (id, hull, houses, flats, residents): (String, String, i64, i64, i64) = sqlx::query_as(
                 " WITH stop AS (

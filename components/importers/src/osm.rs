@@ -1,11 +1,14 @@
 use std::process::{ExitStatus, Stdio};
 use tokio::io::{AsyncBufReadExt, BufReader};
 use tokio::process::Command;
-use tracing::{debug, info};
 
-use common::{anyhow, Result};
+use common::boxed_error;
+use common::prelude::*;
 
-pub async fn import_osm_data(database_url: &str, extract_file_path: &str) -> Result<ExitStatus> {
+pub async fn import_osm_data(
+    database_url: &str,
+    extract_file_path: &str,
+) -> Result<ExitStatus, BoxDynError> {
     info!("Running osm2psql import..");
     debug!(extract = extract_file_path);
     let mut process = Command::new("osm2pgsql")
@@ -33,7 +36,7 @@ pub async fn import_osm_data(database_url: &str, extract_file_path: &str) -> Res
     let status = process.wait().await?;
 
     if !status.success() {
-        return Err(anyhow!(
+        return Err(boxed_error!(
             "osm2pgsql failed with status code: {}",
             status.code().unwrap_or(-1)
         ));

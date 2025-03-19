@@ -1,14 +1,11 @@
 use common::database;
-use common::database::Pool;
-use common::Result;
-
+use common::prelude::*;
 use jobs::job::Job;
 use jobs::stop::AnalyzeStopJob;
 
 use clap::{Parser, Subcommand};
 use std::env;
 use std::process;
-use tracing::{error, info};
 use tracing_subscriber::EnvFilter;
 
 #[derive(Parser)]
@@ -33,7 +30,7 @@ async fn main() {
     let cli = Cli::parse();
     let url = env::var("DATABASE_URL").expect("no database connection URL specified");
 
-    let result: Result<()> = async {
+    let result: NoResult = async {
         let pool = database::connect(&url).await?;
 
         return match &cli.command {

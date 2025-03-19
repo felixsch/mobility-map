@@ -1,9 +1,8 @@
 use common::database;
-use common::Result;
+use common::prelude::*;
 
 use std::env;
 use std::process;
-use tracing::{error, info};
 use tracing_subscriber::EnvFilter;
 
 #[tokio::main]
@@ -16,7 +15,7 @@ async fn main() {
 
     info!("Running migrations!");
 
-    let result: Result<()> = async {
+    let result: NoResult = async {
         let pool = database::connect(&url).await?;
 
         database::migrate(&pool).await?;

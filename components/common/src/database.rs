@@ -1,17 +1,11 @@
-use crate::{BoxDynError, Result, StdResult};
-use anyhow::anyhow;
+use crate::prelude::*;
+
 use apalis_sql::postgres::*;
-use futures::future::BoxFuture;
 use log::LevelFilter;
 use sqlx::migrate::{Migration, MigrationSource, Migrator};
 use sqlx::postgres;
 use sqlx::ConnectOptions;
-use std::path::Path;
-use std::time::Duration;
-use tracing::info;
-
-pub use sqlx;
-pub type Pool = sqlx::PgPool;
+use std;
 
 #[derive(Debug, Clone)]
 struct MergedMigrations {
@@ -32,7 +26,7 @@ impl MergedMigrations {
 }
 
 impl<'s> MigrationSource<'s> for MergedMigrations {
-    fn resolve(self) -> BoxFuture<'s, StdResult<Vec<Migration>, BoxDynError>> {
+    fn resolve(self) -> BoxFuture<'s, std::result::Result<Vec<Migration>, BoxDynError>> {
         Box::pin(async move {
             let mut all: Vec<Migration> = self
                 .sources
@@ -48,7 +42,7 @@ impl<'s> MigrationSource<'s> for MergedMigrations {
 }
 
 #[tracing::instrument]
-pub async fn connect(url: &str) -> Result<Pool> {
+pub async fn connect(url: &str) -> Result<Pool, BoxDynError> {
     let mut options: postgres::PgConnectOptions = url.parse()?;
     options = options.log_slow_statements(LevelFilter::Info, Duration::from_secs(5));
 
@@ -60,13 +54,10 @@ pub async fn connect(url: &str) -> Result<Pool> {
 }
 
 #[tracing::instrument]
-pub async fn migrate(pool: &Pool) -> Result<()> {
+pub async fn migrate(pool: &Pool) -> NoResult {
     let apalis: Vec<Migration> = PostgresStorage::migrations().migrations.into_owned();
 
-    let mobility: Vec<Migration> = Path::new("migrations")
-        .resolve()
-        .await
-        .map_err(|e| anyhow!("loading migrations: {}", e))?;
+    let mobility: Vec<Migration> = Path::new("migrations").resolve().await?;
 
     let migrations: MergedMigrations = MergedMigrations::new()
         .add_source(mobility)
@@ -75,15 +66,13 @@ pub async fn migrate(pool: &Pool) -> Result<()> {
     migrations
         .clone()
         .resolve()
-        .await
-        .map_err(|e| anyhow!("loading migrations: {}", e))?
+        .await?
         .iter()
         .for_each(|m| info!("  {} {}", m.version, m.description));
 
     let migrator = Migrator::new(migrations).await?;
 
-    migrator
-        .run(pool)
-        .await
-        .map_err(|e| anyhow!("migrator: {}", e))
+    migrator.run(pool).await?;
+
+    Ok(())
 }

@@ -1,10 +1,5 @@
 use crate::job::Job;
-use common::database::Pool;
-use common::Result;
-
-use futures::future::{BoxFuture, FutureExt};
-use serde::{Deserialize, Serialize};
-use tracing::{debug, info};
+use common::prelude::*;
 
 #[derive(Clone, Serialize, Deserialize)]
 pub struct AnalyzeStopJob {
@@ -20,7 +15,7 @@ impl From<String> for AnalyzeStopJob {
 impl Job for AnalyzeStopJob {
     const NAME: &'static str = "analyze-stop-job";
 
-    fn enqueue(self, pool: &Pool) -> BoxFuture<Result<String>> {
+    fn enqueue(self, pool: &Pool) -> BoxFuture<Result<String, BoxDynError>> {
         async move {
             let id: String = sqlx::query_scalar(
                 "SELECT id FROM apalis.push_job('jobs::stop::AnalyzeStopJob', json_build_object('ifopt', $1));",
@@ -35,7 +30,7 @@ impl Job for AnalyzeStopJob {
         .boxed()
     }
 
-    fn perform_job(self, pool: &Pool) -> BoxFuture<Result<()>> {
+    fn perform_job(self, pool: &Pool) -> BoxFuture<NoResult> {
         async move {
             info!("analyzing stop `{}`..", self.ifopt);
 

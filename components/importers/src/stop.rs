@@ -1,11 +1,7 @@
-use common::database::Pool;
-use common::Result;
+use common::prelude::*;
 
 use itertools::Itertools;
-use serde::Deserialize;
 use sqlx::{Execute, Postgres, QueryBuilder};
-use std::io::Read;
-use tracing::debug;
 
 #[derive(Debug, Deserialize, Clone)]
 pub struct Stop {
@@ -23,7 +19,7 @@ pub struct Stop {
 }
 
 impl Stop {
-    async fn update_or_create_batch(pool: &Pool, batch: &Vec<Stop>) -> Result<()> {
+    async fn update_or_create_batch(pool: &Pool, batch: &Vec<Stop>) -> NoResult {
         let mut builder: QueryBuilder<Postgres> =
             QueryBuilder::new("INSERT INTO stops (id, name, location)");
 
@@ -48,7 +44,11 @@ impl Stop {
     }
 }
 
-pub async fn import_stops<R: Read>(pool: &Pool, reader: R, batch_size: usize) -> Result<usize> {
+pub async fn import_stops<R: Read>(
+    pool: &Pool,
+    reader: R,
+    batch_size: usize,
+) -> Result<usize, BoxDynError> {
     let mut file = csv::Reader::from_reader(reader);
     let mut total = 0;
 

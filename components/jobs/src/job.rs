@@ -1,21 +1,18 @@
-use common::database::Pool;
-use common::Result;
+use common::prelude::BoxDynError;
+use common::prelude::*;
 
 use apalis::prelude::*;
 use apalis_sql::postgres::PostgresStorage;
-use futures::future::{BoxFuture, FutureExt};
-use serde::{Deserialize, Serialize};
-use std::sync::Arc;
 use tokio::signal::ctrl_c;
 
 pub trait Job {
     const NAME: &'static str;
 
-    fn perform_job(self, pool: &Pool) -> BoxFuture<Result<()>>;
+    fn perform_job(self, pool: &Pool) -> BoxFuture<NoResult>;
 
-    fn enqueue(self, pool: &Pool) -> BoxFuture<Result<String>>;
+    fn enqueue(self, pool: &Pool) -> BoxFuture<Result<String, BoxDynError>>;
 
-    fn spawn_worker(pool: Pool) -> BoxFuture<'static, Result<()>>
+    fn spawn_worker(pool: Pool) -> BoxFuture<'static, NoResult>
     where
         Self: Sized + Sync + Serialize + Unpin + Send + 'static,
         for<'de> Self: Deserialize<'de>,

@@ -1,11 +1,12 @@
 use common::batches::batches;
-use common::database::Pool;
-use common::Result;
+use common::prelude::*;
 
 use sqlx;
-use tracing::info;
 
-pub async fn detect_residential_buildings(pool: &Pool, batch_size: i32) -> Result<i32> {
+pub async fn detect_residential_buildings(
+    pool: &Pool,
+    batch_size: i32,
+) -> Result<i32, BoxDynError> {
     let mut count: u64 = 0;
 
     let total: i64 = sqlx::query_scalar("SELECT COUNT(*) FROM osm_buildings")
