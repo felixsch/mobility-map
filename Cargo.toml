@@ -5,10 +5,6 @@ members = [
     "applications/import-gtfs-data",
     "applications/run-stop-analyzer",
     "applications/run-county-analyzer",
-    # "applications/run-state-analyzer",
-    # "applications/run-country-analyzer",
-    "applications/run-frontend",
-    # "applications/run-csv-exporter",
     "applications/mobility-map",
 
     "components/common",
