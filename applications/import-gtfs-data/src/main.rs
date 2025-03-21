@@ -1,7 +1,7 @@
 use common::database;
 use common::prelude::*;
 
-use import;
+use importers;
 
 use std::env;
 use std::process;
@@ -27,7 +27,7 @@ async fn main() {
         let pool = database::connect(&url).await?;
         let archive = File::open(gtfs_file_path)?;
 
-        let timer = import::import_gtfs_data(&pool, archive, batch_size).await?;
+        let timer = importers::import_gtfs_data(&pool, archive, batch_size).await?;
 
         timer.show_duration();
 

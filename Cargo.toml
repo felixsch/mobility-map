@@ -15,7 +15,8 @@ members = [
     "components/importers",
     "components/analyzers",
     "components/jobs",
-    # "components/cli",
+    "components/cli",
+    "components/frontend",
     ]
 resolver="2"
 

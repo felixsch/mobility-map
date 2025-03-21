@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}mobility-map{% endblock %}</title>
+    <link href="/assets/mobility-map.css" rel="stylesheet">
+    <style>
+#map { height: 400px; }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header class="justify-content-center border-bottom">
+        HEADER
+      </header>
+
+      <div class="container mt-4">
+        {% block content %}CONTENT{% endblock %}
+      </div>
+
+      <footer class="justify-content-center border-top">
+        FOOTER
+      </footer>
+
+      <script src="/assets/mobility-map.js"></script>
+  </body>
+</html>

@@ -1,0 +1,20 @@
+[package]
+name = "frontend"
+version = "0.0.1"
+edition = "2021"
+
+[dependencies]
+common  = { path = "../../components/common" }
+analyze = { path = "../../components/analyzers" }
+
+tokio.workspace              = true
+sqlx.workspace               = true
+tracing-subscriber.workspace = true
+serde.workspace              = true
+serde_json.workspace         = true
+
+axum        = { version = "0.7.4", features = ["ws"] }
+askama      = { version = "0.12.1", features = ["with-axum"] }
+askama_axum = { version = "0.4.0" }
+tower-http  = { version = "0.6.2", features = ["fs"] }
+geojson     = { version = "0.24.1" }

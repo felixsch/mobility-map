@@ -3,5 +3,6 @@
 set -e
 echo "building assets.."
 
-pushd applications/run-frontend &> /dev/null
+pushd components/frontend &> /dev/null
+npm install
 npm run build

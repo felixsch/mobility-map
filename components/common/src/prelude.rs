@@ -23,11 +23,13 @@ pub use std::sync::Arc;
 
 // database
 pub type Pool = sqlx::PgPool;
+pub use sqlx::Row;
 
 // logging
 pub use tracing::{debug, error, info};
 
 // io
+pub use std::env;
 pub use std::fs::File;
 pub use std::io::{Read, Seek};
 pub use std::path::Path;
