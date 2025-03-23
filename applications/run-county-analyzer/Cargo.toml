@@ -5,7 +5,7 @@ edition = "2021"
 
 [dependencies]
 common  = { path = "../../components/common" }
-analyze  = { path = "../../components/analyzers" }
+analyzers  = { path = "../../components/analyzers" }
 jobs  = { path = "../../components/jobs" }
 
 tokio.workspace              = true

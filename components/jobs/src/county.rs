@@ -38,7 +38,7 @@ impl Job for AnalyzeCountyJob {
             info!("analyzing county `{}`..", self.ags);
 
             let stops: Vec<String> =
-                analyze::county::fetch_stops_within_county(pool, &self.ags).await?;
+                analyzers::county::fetch_stops_within_county(pool, &self.ags).await?;
 
             let jobs = stops
                 .into_iter()

@@ -34,8 +34,8 @@ impl Job for AnalyzeStopJob {
         async move {
             info!("analyzing stop `{}`..", self.ifopt);
 
-            analyze::stop::calculate_cycle(pool, &self.ifopt).await?;
-            analyze::stop::calculate_stats_by_distances(
+            analyzers::stop::calculate_cycle(pool, &self.ifopt).await?;
+            analyzers::stop::calculate_stats_by_distances(
                 pool,
                 &self.ifopt,
                 common::DISTANCES.into(),

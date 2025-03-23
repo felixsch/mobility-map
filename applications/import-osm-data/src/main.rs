@@ -2,7 +2,7 @@ use common::database;
 use common::prelude::*;
 use common::Timer;
 
-use analyze;
+use analyzers;
 use importers;
 
 use std::env;
@@ -31,7 +31,7 @@ async fn main() {
         let pool = database::connect(&url).await?;
 
         importers::import_osm_data(&url, &extract_file_path).await?;
-        analyze::detect_residential_buildings(&pool, batch_size).await?;
+        analyzers::detect_residential_buildings(&pool, batch_size).await?;
 
         timer.show_duration();
         Ok(())

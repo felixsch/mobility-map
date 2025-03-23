@@ -7,7 +7,7 @@ edition = "2021"
 common    = { path = "../../components/common" }
 jobs      = { path = "../../components/jobs" }
 importers = { path = "../../components/importers" }
-analyze   = { path = "../../components/analyzers" }
+analyzers = { path = "../../components/analyzers" }
 frontend  = { path = "../../components/frontend" }
 
 

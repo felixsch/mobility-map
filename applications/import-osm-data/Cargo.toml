@@ -6,7 +6,7 @@ edition = "2021"
 [dependencies]
 common  = { path = "../../components/common" }
 importers  = { path = "../../components/importers" }
-analyze = { path = "../../components/analyzers" }
+analyzers = { path = "../../components/analyzers" }
 
 tokio.workspace              = true
 tracing-subscriber.workspace = true
