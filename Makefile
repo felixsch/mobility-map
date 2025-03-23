@@ -15,14 +15,14 @@ build: $(SOURCES)
 
 migrate: $(MIGRATIONS)
 	@echo "MIGRATION"
-	docker-compose run -it --rm db-migrator migrate-database
+	docker-compose run -it --rm db-migrator mobility-map migrate
 
 database-up:
 	docker-compose up postgis -d
 
 
 shell: build database-up migrate
-	docker-compose run --rm -it -v $(CURDIR):/mobility-map -w /mobility-map x-mobility-map
+	docker-compose run --rm -it -p 3000:3000 -v $(CURDIR):/mobility-map x-mobility-map
 
 psql:
 	docker-compose exec -ti postgis psql -U ${POSTGRES_USER}
@@ -33,12 +33,3 @@ confirm_clean:
 clean: confirm_clean
 	@echo "Removing all data.."
 	docker-compose down -v --remove-orphans
-
-import-%: build database-up migrate
-	docker-compose run --rm -it importer import-$*
-
-run-%: build database-up migrate
-	docker-compose run --rm -it x-mobility-map run-$*
-
-frontend: build database-up migrate
-	docker-compose run --rm -it -p 3000:3000 x-mobility-map run-frontend

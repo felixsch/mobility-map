@@ -6,7 +6,7 @@ use tower_http::services;
 pub use axum::Router;
 
 pub fn new(pool: Pool) -> axum::Router {
-    let assets = services::ServeDir::new("applications/run-frontend/assets");
+    let assets = services::ServeDir::new("components/frontend/assets");
 
     Router::new()
         .route("/", get(routes::index))

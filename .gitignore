@@ -8,5 +8,6 @@
 **/*.swo
 .DS_Store
 **/node_modules/
+components/frontend/assets/
 
 data/**

@@ -30,7 +30,7 @@ services:
     profiles:
       - one-shot
 
-  db-migrator:
+  migrate-database:
     <<: [*mobility-map, *one-shot]
     depends_on:
       postgis:

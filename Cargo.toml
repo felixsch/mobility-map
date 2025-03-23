@@ -1,10 +1,7 @@
 [workspace]
 members = [
-    "applications/migrate-database",
     "applications/import-osm-data",
     "applications/import-gtfs-data",
-    "applications/run-stop-analyzer",
-    "applications/run-county-analyzer",
     "applications/mobility-map",
 
     "components/common",
