@@ -26,3 +26,6 @@ COPY . .
 RUN cargo build --release --workspace
 RUN ./scripts/install-all-applications
 RUN ./scripts/build-assets
+
+ENTRYPOINT ["mobility-map"]
+CMD [""]

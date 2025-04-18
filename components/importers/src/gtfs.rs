@@ -7,13 +7,11 @@ use common::Timer;
 use zip::read::ZipArchive;
 
 pub async fn import_gtfs_data<R: Read + Seek>(
+    timer: &mut Timer,
     pool: &Pool,
     archive_hdl: R,
     batch_size: usize,
-) -> Result<Timer, BoxDynError> {
-    let mut timer = Timer::new();
-    timer.start_ticking();
-
+) -> NoResult {
     let mut archive = ZipArchive::new(archive_hdl)?;
 
     {
@@ -32,5 +30,5 @@ pub async fn import_gtfs_data<R: Read + Seek>(
         timer.push_info("stop times proccessed", total_stop_times);
     }
 
-    Ok(timer)
+    Ok(())
 }

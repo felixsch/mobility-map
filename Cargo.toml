@@ -1,7 +1,5 @@
 [workspace]
 members = [
-    "applications/import-osm-data",
-    "applications/import-gtfs-data",
     "applications/mobility-map",
 
     "components/common",

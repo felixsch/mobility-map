@@ -15,32 +15,26 @@ services:
       retries: 5
       start_period: 10s
 
-  x-mobility-map: &mobility-map
+  mobility-map: &mobility-map
     build:
       context: .
       dockerfile: Dockerfile
     image: mobility-map
     env_file: ".env"
 
-  x-one-shot: &one-shot
-    restart: no
-    labels:
-      - "com.docker.compose.container-number=0"
-      - "com.docker.compose.oneoff=True"
-    profiles:
-      - one-shot
-
-  migrate-database:
-    <<: [*mobility-map, *one-shot]
+  import:
+    <<: [*mobility-map]
+    volumes:
+      - ./data:/data
+      - ./scripts/mobility-flex.lua:/config/mobility-flex.lua
     depends_on:
       postgis:
         condition: service_healthy
 
-  importer:
-    <<: [*mobility-map, *one-shot]
-    volumes:
-      - ./data:/usr/src/mobility-map/data
-      - ./scripts/mobility-flex.lua:/config/mobility-flex.lua
+  frontend:
+    <<: [*mobility-map]
+    ports:
+      - 3000:3000
     depends_on:
       postgis:
         condition: service_healthy

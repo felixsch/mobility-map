@@ -15,14 +15,13 @@ build: $(SOURCES)
 
 migrate: $(MIGRATIONS)
 	@echo "MIGRATION"
-	docker-compose run -it --rm db-migrator mobility-map migrate
+	docker-compose run -it --rm mobility-map migrate
 
 database-up:
 	docker-compose up postgis -d
 
-
 shell: build database-up migrate
-	docker-compose run --rm -it -p 3000:3000 -v $(CURDIR):/mobility-map x-mobility-map
+	docker-compose run --rm -it --entrypoint /bin/bash -v $(CURDIR):/src run
 
 psql:
 	docker-compose exec -ti postgis psql -U ${POSTGRES_USER}
